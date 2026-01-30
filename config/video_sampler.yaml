@@ -4,6 +4,8 @@ sampling:
   parallax_threshold_px: 100
   output_dir: images
   fallback_fps: 30
+  start_time: null
+  end_time: null
 
 features:
   type: ORB

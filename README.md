@@ -16,8 +16,10 @@
 
 参数：
 - `--video`：输入视频路径（必填）
-- `--config`：配置文件路径（默认 config.yaml）
+- `--config`：配置文件路径（默认 config/video_sampler.yaml）
 - `--output`：输出目录（覆盖配置中的 output_dir）
+- `--start-time`：抽帧起始时间（秒，可选）
+- `--end-time`：抽帧结束时间（秒，可选）
 - `--log-level`：日志级别（DEBUG/INFO/WARNING/ERROR）
 
 示例（仅说明）：
@@ -30,6 +32,8 @@
 - sampling.initial_fps：初始采样帧率
 - sampling.blur_threshold：模糊阈值（Laplacian 方差）
 - sampling.parallax_threshold_px：视差阈值（像素）
+- sampling.start_time：抽帧起始时间（秒，默认全视频）
+- sampling.end_time：抽帧结束时间（秒，默认全视频）
 - features.type：ORB 或 SIFT
 - features.max_features：最大特征数
 - features.min_matches：最小匹配数

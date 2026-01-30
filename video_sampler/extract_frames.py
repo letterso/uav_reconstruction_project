@@ -63,6 +63,8 @@ def sample_video(
     blur_threshold = float(sampling_cfg["blur_threshold"])
     parallax_threshold = float(sampling_cfg["parallax_threshold_px"])
     fallback_fps = float(sampling_cfg["fallback_fps"])
+    start_time = sampling_cfg.get("start_time")
+    end_time = sampling_cfg.get("end_time")
     min_matches = int(feature_cfg["min_matches"])
 
     use_ssim = bool(quality_cfg.get("use_ssim", False))
@@ -79,7 +81,13 @@ def sample_video(
     stats = SamplingStats()
     last_kept_gray = None
 
-    frame_iter = iter_video_frames(video_path, target_fps, fallback_fps)
+    frame_iter = iter_video_frames(
+        video_path,
+        target_fps,
+        fallback_fps,
+        start_time=start_time,
+        end_time=end_time,
+    )
     for frame_idx, timestamp, frame in tqdm(frame_iter, desc="Sampling frames"):
         stats.total += 1
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
