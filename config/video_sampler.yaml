@@ -1,0 +1,15 @@
+sampling:
+  initial_fps: 5
+  blur_threshold: 150
+  parallax_threshold_px: 100
+  output_dir: frames
+  fallback_fps: 30
+
+features:
+  type: ORB
+  max_features: 3000
+  min_matches: 50
+
+quality:
+  use_ssim: true
+  ssim_max: 0.98
