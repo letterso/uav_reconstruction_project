@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 
 import cv2
 import numpy as np
@@ -12,6 +12,8 @@ from tqdm import tqdm
 from .blur_filter import is_blurry
 from .parallax_filter import FeatureExtractor, evaluate_parallax
 from .video_io import iter_video_frames
+from .srt_parser import SRTParser, find_srt_file
+from .exif_writer import write_image_with_exif
 
 
 logger = logging.getLogger(__name__)
@@ -72,6 +74,22 @@ def sample_video(
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Check for SRT file
+    video_path = Path(video_path)
+    srt_path = find_srt_file(video_path)
+    srt_parser: Optional[SRTParser] = None
+    
+    if srt_path:
+        logger.info("Found SRT file: %s", srt_path)
+        srt_parser = SRTParser(srt_path)
+        if srt_parser.has_metadata():
+            logger.info("SRT metadata will be embedded in output images")
+        else:
+            logger.warning("SRT file found but no metadata parsed")
+            srt_parser = None
+    else:
+        logger.info("No SRT file found, proceeding without GPS metadata")
 
     extractor = FeatureExtractor(
         feature_type=feature_cfg["type"],
@@ -141,16 +159,36 @@ def sample_video(
                 )
                 continue
 
-        output_path = output_dir / f"{stats.kept:06d}.png"
-        cv2.imwrite(str(output_path), frame)
+        # Determine output format based on whether we have GPS metadata
+        if srt_parser and srt_parser.has_metadata():
+            output_path = output_dir / f"{stats.kept:06d}.jpg"  # JPEG for EXIF support
+        else:
+            output_path = output_dir / f"{stats.kept:06d}.png"  # PNG if no metadata
+        
+        # Get GPS metadata if available
+        gps_metadata = None
+        if srt_parser:
+            gps_metadata = srt_parser.get_metadata_by_timestamp(timestamp)
+            if gps_metadata:
+                logger.debug(
+                    "Frame %s has GPS: lat=%.6f, lon=%.6f, alt=%.2fm",
+                    frame_idx,
+                    gps_metadata.latitude,
+                    gps_metadata.longitude,
+                    gps_metadata.rel_alt,
+                )
+        
+        # Write image with EXIF metadata
+        write_image_with_exif(frame, output_path, gps_metadata)
         stats.kept += 1
         last_kept_gray = gray
 
         logger.info(
-            "Keep frame %s at %.3fs -> %s",
+            "Keep frame %s at %.3fs -> %s%s",
             frame_idx,
             timestamp,
             output_path,
+            " (with GPS)" if gps_metadata else "",
         )
 
     if stats.kept == 0:

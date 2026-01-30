@@ -2,6 +2,8 @@
 
 用于从视频中稳定抽取高质量帧，适配 COLMAP Sequential SfM。流程包含高频采样、模糊过滤、视差筛选（可选 SSIM 去冗余）。
 
+**🆕 新功能**: 支持 DJI SRT 文件自动解析，将 GPS 和高度信息嵌入图像 EXIF，用于 COLMAP 稀疏重建。详见 [SRT 集成说明](docs/SRT集成说明.md)。
+
 ## 环境配置
 
 - Python 3.14+（见 [.python-version](.python-version)）
@@ -22,8 +24,33 @@
 - `--end-time`：抽帧结束时间（秒，可选）
 - `--log-level`：日志级别（DEBUG/INFO/WARNING/ERROR）
 
-示例（仅说明）：
-- 运行入口脚本并传入 `--video` 与可选配置/输出参数
+示例：
+```bash
+# 基本用法
+uv run python main.py --video videos/dji.mp4
+
+# 带 SRT 文件（自动检测同名 .SRT 文件）
+uv run python main.py --video videos/DJI_20260104163018_0024_D.mp4
+
+# 抽取部分视频片段
+uv run python main.py --video videos/dji.mp4 --start-time 10 --end-time 60
+```
+
+## 功能特性
+
+### 核心抽帧流程
+- **高频采样**: 按配置的 FPS 进行初始采样
+- **模糊过滤**: 基于 Laplacian 方差检测并去除运动模糊帧
+- **视差筛选**: 使用 ORB/SIFT 特征匹配，确保足够的视差和重叠
+- **SSIM 去冗余**: 可选的结构相似性检测，去除近似重复帧
+
+### GPS 元数据支持 🆕
+- **自动 SRT 检测**: 检测视频同目录下的同名 SRT 文件
+- **GPS 信息解析**: 提取经纬度、相对高度、绝对高度
+- **EXIF 嵌入**: 将 GPS 数据写入输出图像的 EXIF（JPEG 格式）
+- **COLMAP 兼容**: 生成的图像可直接用于 COLMAP GPS 辅助重建
+
+详细说明见 [SRT 集成说明](docs/SRT集成说明.md)
 
 ## 配置说明
 
@@ -39,3 +66,10 @@
 - features.min_matches：最小匹配数
 
 详细算法与设计见 [docs/开发文档.md](docs/开发文档.md)
+
+## 输出格式
+
+- **有 SRT 元数据**: 输出 JPEG 格式（包含 GPS EXIF）
+- **无 SRT 元数据**: 输出 PNG 格式（保持原逻辑）
+
+输出文件命名: `000000.jpg`, `000001.jpg`, ... (6位补零)
