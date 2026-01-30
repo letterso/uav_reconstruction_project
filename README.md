@@ -2,8 +2,6 @@
 
 用于从视频中稳定抽取高质量帧，适配 COLMAP Sequential SfM。流程包含高频采样、模糊过滤、视差筛选（可选 SSIM 去冗余）。
 
-**🆕 新功能**: 支持 DJI SRT 文件自动解析，将 GPS 和高度信息嵌入图像 EXIF，用于 COLMAP 稀疏重建。详见 [SRT 集成说明](docs/SRT集成说明.md)。
-
 ## 环境配置
 
 - Python 3.14+（见 [.python-version](.python-version)）
@@ -56,20 +54,32 @@ uv run python main.py --video videos/dji.mp4 --start-time 10 --end-time 60
 
 默认配置在 [config.yaml](./config/video_sampler.yaml)：
 
+**采样参数**：
 - sampling.initial_fps：初始采样帧率
 - sampling.blur_threshold：模糊阈值（Laplacian 方差）
 - sampling.parallax_threshold_px：视差阈值（像素）
 - sampling.start_time：抽帧起始时间（秒，默认全视频）
 - sampling.end_time：抽帧结束时间（秒，默认全视频）
+
+**特征参数**：
 - features.type：ORB 或 SIFT
 - features.max_features：最大特征数
 - features.min_matches：最小匹配数
+
+**质量参数**：
+- quality.use_ssim：是否启用SSIM去冗余
+- quality.ssim_max：SSIM相似度阈值
+- quality.jpeg_quality：JPEG质量（0-100，默认100最高质量）
 
 详细算法与设计见 [docs/开发文档.md](docs/开发文档.md)
 
 ## 输出格式
 
-- **有 SRT 元数据**: 输出 JPEG 格式（包含 GPS EXIF）
+- **有 SRT 元数据**: 输出 JPEG 格式（包含 GPS EXIF，质量100）
 - **无 SRT 元数据**: 输出 PNG 格式（保持原逻辑）
 
 输出文件命名: `000000.jpg`, `000001.jpg`, ... (6位补零)
+
+## 开发进度
+
+**🆕 新功能**: 支持 DJI SRT 文件自动解析，将 GPS 和高度信息嵌入图像 EXIF，用于 COLMAP 稀疏重建。详见 [SRT 集成说明](docs/SRT集成说明.md)。
