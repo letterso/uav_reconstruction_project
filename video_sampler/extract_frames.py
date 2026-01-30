@@ -141,7 +141,7 @@ def sample_video(
                 )
                 continue
 
-        output_path = output_dir / f"frame_{stats.kept:06d}.png"
+        output_path = output_dir / f"{stats.kept:06d}.png"
         cv2.imwrite(str(output_path), frame)
         stats.kept += 1
         last_kept_gray = gray
