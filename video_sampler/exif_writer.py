@@ -49,6 +49,7 @@ def write_image_with_exif(
     frame: np.ndarray,
     output_path: str | Path,
     metadata: Optional[SRTFrameMetadata] = None,
+    jpeg_quality: int = 100,
 ) -> None:
     """Write image with GPS EXIF data if metadata is provided.
     
@@ -56,6 +57,7 @@ def write_image_with_exif(
         frame: Image frame (BGR format from cv2)
         output_path: Path to save the image (will be saved as JPEG if metadata is provided)
         metadata: Optional SRT metadata containing GPS and altitude
+        jpeg_quality: JPEG quality (0-100), default 100 for maximum quality
     """
     output_path = Path(output_path)
     
@@ -101,8 +103,18 @@ def write_image_with_exif(
         # Serialize EXIF
         exif_bytes = piexif.dump(exif_dict)
         
+        # Clamp quality to valid range
+        jpeg_quality = max(0, min(100, jpeg_quality))
+        
         # Write image first without EXIF
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 95]  # High quality JPEG
+        # Use high quality settings for best image preservation
+        encode_param = [
+            int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality,  # User-configurable quality (0-100)
+            int(cv2.IMWRITE_JPEG_PROGRESSIVE), 0,  # Disable progressive for better quality
+            int(cv2.IMWRITE_JPEG_OPTIMIZE), 1,     # Enable Huffman optimization
+            int(cv2.IMWRITE_JPEG_LUMA_QUALITY), jpeg_quality,  # Luma channel quality
+            int(cv2.IMWRITE_JPEG_CHROMA_QUALITY), jpeg_quality  # Chroma channel quality
+        ]
         cv2.imwrite(str(output_path), frame, encode_param)
         
         # Insert EXIF into the saved file

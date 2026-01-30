@@ -13,5 +13,6 @@ features:
   min_matches: 50
 
 quality:
-  use_ssim: true
+  use_ssim: false
   ssim_max: 0.98
+  jpeg_quality: 98  # JPEG quality (0-100), 100 = maximum quality

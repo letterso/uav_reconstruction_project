@@ -71,6 +71,7 @@ def sample_video(
 
     use_ssim = bool(quality_cfg.get("use_ssim", False))
     ssim_max = float(quality_cfg.get("ssim_max", 0.98))
+    jpeg_quality = int(quality_cfg.get("jpeg_quality", 100))
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -179,7 +180,7 @@ def sample_video(
                 )
         
         # Write image with EXIF metadata
-        write_image_with_exif(frame, output_path, gps_metadata)
+        write_image_with_exif(frame, output_path, gps_metadata, jpeg_quality)
         stats.kept += 1
         last_kept_gray = gray
 
