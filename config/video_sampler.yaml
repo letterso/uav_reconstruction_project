@@ -2,7 +2,7 @@ sampling:
   initial_fps: 5
   blur_threshold: 150
   parallax_threshold_px: 100
-  output_dir: frames
+  output_dir: images
   fallback_fps: 30
 
 features:
