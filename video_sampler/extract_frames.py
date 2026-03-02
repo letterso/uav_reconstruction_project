@@ -65,6 +65,7 @@ def sample_video(
     blur_threshold = float(sampling_cfg["blur_threshold"])
     parallax_threshold = float(sampling_cfg["parallax_threshold_px"])
     fallback_fps = float(sampling_cfg["fallback_fps"])
+    only_keyframes = bool(sampling_cfg.get("only_keyframes", False))
     start_time = sampling_cfg.get("start_time")
     end_time = sampling_cfg.get("end_time")
     min_matches = int(feature_cfg["min_matches"])
@@ -104,6 +105,7 @@ def sample_video(
         video_path,
         target_fps,
         fallback_fps,
+        only_keyframes=only_keyframes,
         start_time=start_time,
         end_time=end_time,
     )

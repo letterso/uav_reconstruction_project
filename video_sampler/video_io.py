@@ -106,6 +106,7 @@ def _iter_frames_av(
     target_fps: float,
     start_time: float,
     end_time: float | None,
+    only_keyframes: bool,
 ) -> Generator[FrameItem, None, None]:
     container = av.open(str(video_path))
     stream = container.streams.video[0]
@@ -120,6 +121,10 @@ def _iter_frames_av(
                 timestamp = float(frame.pts * stream.time_base)
             if timestamp is None:
                 timestamp = frame_idx / max(target_fps, 1e-6)
+
+            if only_keyframes and not frame.key_frame:
+                frame_idx += 1
+                continue
 
             if timestamp < start_time:
                 frame_idx += 1
@@ -183,6 +188,7 @@ def iter_video_frames(
     fallback_fps: float,
     start_time: float | None = None,
     end_time: float | None = None,
+    only_keyframes: bool = False,
 ) -> Generator[FrameItem, None, None]:
     video_path = Path(video_path)
     if not video_path.exists():
@@ -192,6 +198,16 @@ def iter_video_frames(
     start_time, end_time = _normalize_time_range(duration, start_time, end_time)
 
     if _HAS_AV:
-        yield from _iter_frames_av(video_path, target_fps, start_time, end_time)
+        yield from _iter_frames_av(
+            video_path,
+            target_fps,
+            start_time,
+            end_time,
+            only_keyframes,
+        )
     else:
+        if only_keyframes:
+            raise RuntimeError(
+                "only_keyframes=True requires PyAV backend; OpenCV fallback does not expose keyframe flags."
+            )
         yield from _iter_frames_cv2(video_path, target_fps, fallback_fps, start_time, end_time)

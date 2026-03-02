@@ -1,9 +1,10 @@
 sampling:
-  initial_fps: 5
-  blur_threshold: 150
+  initial_fps: 20
+  blur_threshold: 10
   parallax_threshold_px: 100
   output_dir: images
   fallback_fps: 30
+  only_keyframes: false  # 仅提取关键帧(I帧/Intra-coded)
   start_time: null
   end_time: null
 

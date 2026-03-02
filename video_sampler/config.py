@@ -13,6 +13,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "parallax_threshold_px": 20,
         "output_dir": "frames",
         "fallback_fps": 30,
+        "only_keyframes": False,
         "start_time": None,
         "end_time": None,
     },
