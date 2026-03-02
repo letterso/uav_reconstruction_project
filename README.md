@@ -1,6 +1,6 @@
-# COLMAP 视频抽帧工具
+# 视频抽帧工具
 
-用于从视频中稳定抽取高质量帧，适配 COLMAP Sequential SfM。流程包含高频采样、模糊过滤、视差筛选（可选 SSIM 去冗余）。
+用于从视频中稳定抽取高质量帧。流程包含高频采样、模糊过滤、视差筛选（可选 SSIM 去冗余）。
 
 ## 环境配置
 
@@ -83,9 +83,3 @@ uv run python main.py --video videos/dji.mp4 --start-time 10 --end-time 60
 - **无 SRT 元数据**: 输出 PNG 格式（保持原逻辑）
 
 输出文件命名: `000000.jpg`, `000001.jpg`, ... (6位补零)
-
-## 开发进度
-
-**🆕 新功能**:
-- 支持 DJI SRT 文件自动解析，将 GPS 和高度信息嵌入图像 EXIF，用于 COLMAP 稀疏重建。详见 [SRT 集成说明](docs/SRT集成说明.md)。
-- 支持可选“仅提取关键帧（I 帧 / Intra-coded）”。
