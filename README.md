@@ -38,6 +38,7 @@ uv run python main.py --video videos/dji.mp4 --start-time 10 --end-time 60
 
 ### 核心抽帧流程
 - **高频采样**: 按配置的 FPS 进行初始采样
+- **关键帧抽取（可选）**: 支持仅提取视频关键帧（I 帧 / Intra-coded）
 - **模糊过滤**: 基于 Laplacian 方差检测并去除运动模糊帧
 - **视差筛选**: 使用 ORB/SIFT 特征匹配，确保足够的视差和重叠
 - **SSIM 去冗余**: 可选的结构相似性检测，去除近似重复帧
@@ -58,6 +59,7 @@ uv run python main.py --video videos/dji.mp4 --start-time 10 --end-time 60
 - sampling.initial_fps：初始采样帧率
 - sampling.blur_threshold：模糊阈值（Laplacian 方差）
 - sampling.parallax_threshold_px：视差阈值（像素）
+- sampling.only_keyframes：是否仅提取关键帧（I 帧，默认 false）
 - sampling.start_time：抽帧起始时间（秒，默认全视频）
 - sampling.end_time：抽帧结束时间（秒，默认全视频）
 
@@ -73,6 +75,8 @@ uv run python main.py --video videos/dji.mp4 --start-time 10 --end-time 60
 
 详细算法与设计见 [docs/开发文档.md](docs/开发文档.md)
 
+版本更新记录见 [docs/CHANGELOG.md](docs/CHANGELOG.md)
+
 ## 输出格式
 
 - **有 SRT 元数据**: 输出 JPEG 格式（包含 GPS EXIF，质量100）
@@ -82,4 +86,6 @@ uv run python main.py --video videos/dji.mp4 --start-time 10 --end-time 60
 
 ## 开发进度
 
-**🆕 新功能**: 支持 DJI SRT 文件自动解析，将 GPS 和高度信息嵌入图像 EXIF，用于 COLMAP 稀疏重建。详见 [SRT 集成说明](docs/SRT集成说明.md)。
+**🆕 新功能**:
+- 支持 DJI SRT 文件自动解析，将 GPS 和高度信息嵌入图像 EXIF，用于 COLMAP 稀疏重建。详见 [SRT 集成说明](docs/SRT集成说明.md)。
+- 支持可选“仅提取关键帧（I 帧 / Intra-coded）”。
